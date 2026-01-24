@@ -1,2 +1,3 @@
-# ObServe-Swing
-Java Swing utilities using ObServe observable structures
+ObServe-Swing
+====
+Swing-dependent utilities built on ObServe.  ObServe is a set of observable structures.  ObServe-Swing contains utilities for building Swing user interfaces backed by observable structures.  Using observable structures to back user interface models is very handy, because the same kind of structures are applicable to multitudes of different kinds of UI components.  For example, an ObservableCollection can be used to back tables, combo boxes, trees, and much more.
