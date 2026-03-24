@@ -285,6 +285,8 @@ public interface TableContentControl {
 	default SortedMatchSet[] findMatches(List<? extends ValueRenderer<?>> categories, CharSequence[] texts) {
 		SortedMatchSet[] matches = null;
 		for (int i = 0; i < texts.length; i++) {
+			if (texts[i] == null)
+				continue;
 			SortedMatchSet match = findMatches(categories.get(i), texts[i]);
 			if (match != null) {
 				if (matches == null)

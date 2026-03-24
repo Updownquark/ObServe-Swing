@@ -31,6 +31,7 @@ import org.qommons.BreakpointHere;
 import org.qommons.Causable;
 import org.qommons.Subscription;
 import org.qommons.ThreadConstraint;
+import org.qommons.Transaction;
 import org.qommons.collect.CollectionElement;
 import org.qommons.collect.ElementId;
 import org.qommons.collect.ListElement;
@@ -535,27 +536,34 @@ public class VirtualMultiPane<T> extends JComponent implements Scrollable {
 	protected void paintChildren(Graphics g) {
 		Rectangle clip = g.getClipBounds();
 		VMPanelRenderMC<T> cell = new VMPanelRenderMC<>();
-		// Painting is done in reverse order, to give lower-index widgets higher visibility
-		int row = theValues.size();
-		for (CollectionElement<T> value : theValues.elements().reverse()) {
-			row--;
-			Rectangle bounds = theValueBounds.get(row);
-			if (bounds == null || !clip.intersects(bounds))
-				continue;
-			if (theHover.component != null && theHover.valueEquals(value.getElementId())) {
-				if (isPaintPrint)
-					System.out.println("TP paint[" + row + "] hover " + theHover.component.getBounds());
-				continue; // Handled by the actual component
-			} else if (theFocus.component != null && theFocus.valueEquals(value.getElementId())) {
-				if (isPaintPrint)
-					System.out.println("TP paint[" + row + "] focus " + theFocus.component.getBounds());
-				continue; // Handled by the actual component
-			} else if (isPaintPrint)
-				System.out.println("TP paint[" + row + "] " + bounds);
+		try (Transaction t = theValues.lock(false, null)) {
+			// Painting is done in reverse order, to give lower-index widgets higher visibility
+			int row = theValues.size();
+			for (CollectionElement<T> value : theValues.elements().reverse()) {
+				row--;
+				Rectangle bounds = theValueBounds.get(row);
+				if (bounds == null || !clip.intersects(bounds))
+					continue;
+				if (theHover.component != null && theHover.valueEquals(value.getElementId())) {
+					if (isPaintPrint)
+						System.out.println("TP paint[" + row + "] hover " + theHover.component.getBounds());
+					continue; // Handled by the actual component
+				} else if (theFocus.component != null && theFocus.valueEquals(value.getElementId())) {
+					if (isPaintPrint)
+						System.out.println("TP paint[" + row + "] focus " + theFocus.component.getBounds());
+					continue; // Handled by the actual component
+				} else if (isPaintPrint)
+					System.out.println("TP paint[" + row + "] " + bounds);
 
-			cell.set(value.get(), row).setEnabled(theValues.mutableElement(value.getElementId()).isEnabled());
-			Component renderer = theRenderer.getCellRendererComponent(this, cell, CellRenderContext.DEFAULT);
-			theRenderPane.paintComponent(g, renderer, this, bounds.x, bounds.y, bounds.width, bounds.height, true);
+				cell.set(value.get(), row).setEnabled(theValues.mutableElement(value.getElementId()).isEnabled());
+				Component renderer = theRenderer.getCellRendererComponent(this, cell, CellRenderContext.DEFAULT);
+				theRenderPane.paintComponent(g, renderer, this, bounds.x, bounds.y, bounds.width, bounds.height, true);
+			}
+		} catch (IllegalArgumentException e) {
+			// This can happen with safe observable collections due to the attempt to retrieve the mutable element needing to reach back
+			// into the source collection, which may not be thread-safe.
+			// We can tolerate these issues in the paint method,
+			// assuming that it will be invoked again after all the modifications are done.
 		}
 		super.paintChildren(g);
 	}
