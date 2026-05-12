@@ -1881,7 +1881,7 @@ public class MultiRangeSlider extends ConformingPanel {
 				Range current = range.get();
 				if (evt.getNewValue() == current.getMax())
 					range.set(current, evt);
-				else
+				else if (evt.getNewValue() >= current.getMin())
 					range.set(Range.forMinMax(current.getMin(), evt.getNewValue()), evt);
 			} finally {
 				callbackLock[0] = false;

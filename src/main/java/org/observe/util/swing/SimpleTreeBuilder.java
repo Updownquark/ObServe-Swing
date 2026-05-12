@@ -525,7 +525,7 @@ public class SimpleTreeBuilder<F, P extends SimpleTreeBuilder<F, P>> extends Sim
 			ObservableTreeModel.syncSelection(getEditor(), theValueSingleSelection//
 				.safe(ThreadConstraint.EDT).//
 				<BetterList<F>> transformReversible(tx -> tx//
-					.map(v -> model.getValuePath(v, true))//
+					.map(v -> model.getValuePath(v, v != null))//
 					.replaceSource(path -> path == null ? null : path.getLast(), //
 						// If a node is present in more than one place in the tree, this will be needed
 						rv -> rv.allowInexactReverse(true))),
