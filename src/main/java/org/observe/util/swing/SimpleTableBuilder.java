@@ -242,7 +242,7 @@ implements TableBuilder<R, T, P> {
 	@Override
 	public P withCopy(Function<? super R, ? extends R> copier, Consumer<DataAction<R, ?>> actionMod) {
 		return withMultiAction(null, values -> {
-			try (Transaction t = theFilteredRows.lock(true, null)) {
+			try (Transaction t = theFilteredRows.lockWrite(false, null)) {
 				betterCopy(copier);
 			}
 		}, action -> {
@@ -296,11 +296,11 @@ implements TableBuilder<R, T, P> {
 						return cell.getCellValue();
 					else if (!up && cell.getRowIndex() == theFilteredRows.size() - 1)
 						return cell.getCellValue();
-					try (Transaction t = theFilteredRows.lock(true, null)) {
+						try (Transaction t = theFilteredRows.lockWrite(false, null)) {
 						CollectionElement<R> row = theRows.getElement(cell.getRowIndex());
-							CollectionElement<R> adj = row.getAdjacent(!up);
+						CollectionElement<R> adj = row.getAdjacent(!up);
 						if (adj != null) {
-								CollectionElement<R> adj2 = adj.getAdjacent(!up);
+							CollectionElement<R> adj2 = adj.getAdjacent(!up);
 							theRows.move(row.getElementId(), up ? CollectionElement.getElementId(adj2) : adj.getElementId(),
 								up ? adj.getElementId() : CollectionElement.getElementId(adj2), up, null);
 							ListSelectionModel selModel = getEditor().getSelectionModel();
@@ -323,7 +323,7 @@ implements TableBuilder<R, T, P> {
 	@Override
 	public P withMoveToEnd(boolean up, Consumer<DataAction<R, ?>> actionMod) {
 		return withMultiAction(null, values -> {
-			try (Transaction t = theFilteredRows.lock(true, null)) {
+			try (Transaction t = theFilteredRows.lockWrite(false, null)) {
 				// Ignore the given values and use the selection model so we get the indexes right in the case of duplicates
 				ListSelectionModel selModel = getEditor().getSelectionModel();
 				int selectionCount = 0;
@@ -346,7 +346,7 @@ implements TableBuilder<R, T, P> {
 		}, action -> {
 			ObservableValue<String> enabled;
 			Supplier<String> enabledGet = () -> {
-				try (Transaction t = theFilteredRows.lock(false, null)) {
+				try (Transaction t = theFilteredRows.lock(false)) {
 					ListSelectionModel selModel = getEditor().getSelectionModel();
 					if (selModel.isSelectionEmpty())
 						return "Nothing selected";
@@ -510,7 +510,7 @@ implements TableBuilder<R, T, P> {
 				MutableCollectionElement<R> el = (MutableCollectionElement<R>) getRows()
 					.mutableElement(getRows().getElement(index).getElementId());
 				if (el.isAcceptable(el.get()) == null) {
-					try (Transaction t = getRows().lock(true, cause)) {
+					try (Transaction t = getRows().lockWrite(false, cause)) {
 						el.set(el.get());
 					}
 				}
@@ -612,7 +612,7 @@ implements TableBuilder<R, T, P> {
 
 	@Override
 	protected void forAllVisibleData(AbstractObservableTableModel<R> model, Consumer<ModelRow<R>> forEach) {
-		try (Transaction t = theFilteredRows.lock(false, null)) {
+		try (Transaction t = theFilteredRows.lock(false)) {
 			ModelRowImpl<R> row = new ModelRowImpl<>(getEditor());
 			for (R rowValue : theFilteredRows)
 				forEach.accept(row.nextRow(rowValue));
@@ -695,7 +695,7 @@ implements TableBuilder<R, T, P> {
 
 		@Override
 		protected Transaction lockRows(boolean forWrite) {
-			return theRows.lock(forWrite, null);
+			return forWrite ? theRows.lockWrite(false, null) : theRows.lock(false);
 		}
 
 		@Override

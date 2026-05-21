@@ -377,12 +377,12 @@ implements TreeTableEditor<F, P> {
 				BetterList<F>[] currentRows = new BetterList[editor.getRowCount()];
 				for (int r = 0; r < currentRows.length; r++)
 					currentRows[r] = model.getRow(r, editor);
-				try (Transaction t = rows.lock(true, null)) {
+				try (Transaction t = rows.lockWrite(false, null)) {
 					CollectionUtils.synchronize(rows, Arrays.asList(currentRows), SimpleTreeTableBuilder::rowsIdentical)//
-						.simple(FunctionUtils.identity())//
-						.commonUses(true, updateAll)//
-						.rightOrder()//
-						.adjust();
+					.simple(FunctionUtils.identity())//
+					.commonUses(true, updateAll)//
+					.rightOrder()//
+					.adjust();
 				}
 			}
 		};

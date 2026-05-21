@@ -1315,7 +1315,7 @@ extends SimpleComponentEditor<T, P> implements AbstractTableBuilder<R, T, P>, Co
 		@Override
 		protected Transferable createTransferable(JComponent c) {
 			AbstractObservableTableModel<R> model = (AbstractObservableTableModel<R>) getEditor().getModel();
-			try (Transaction rowT = lockRows(false); Transaction colT = getColumns().lock(false, null)) {
+			try (Transaction rowT = lockRows(false); Transaction colT = getColumns().lock(false)) {
 				if (getEditor().getSelectedRowCount() == 0)
 					return null;
 				List<R> selectedRows = new ArrayList<>(getEditor().getSelectedRowCount());
@@ -1403,7 +1403,7 @@ extends SimpleComponentEditor<T, P> implements AbstractTableBuilder<R, T, P>, Co
 		@Override
 		public int getSourceActions(JComponent c) {
 			int actions = 0;
-			try (Transaction rowT = lockRows(false); Transaction colT = getColumns().lock(false, null)) {
+			try (Transaction rowT = lockRows(false); Transaction colT = getColumns().lock(false)) {
 				if (getEditor().getSelectedRowCount() == 0)
 					return actions;
 				if (theRowSource != null)
@@ -1450,7 +1450,7 @@ extends SimpleComponentEditor<T, P> implements AbstractTableBuilder<R, T, P>, Co
 
 		@Override
 		public boolean canImport(TransferSupport support) {
-			try (Transaction rowT = lockRows(false); Transaction colT = getColumns().lock(false, null)) {
+			try (Transaction rowT = lockRows(false); Transaction colT = getColumns().lock(false)) {
 				TransferTarget target = getTarget(support);
 				return doImport(support, target.rowIndex, target.colIndex, target.beforeRow, target.beforeCol, target.targetRow,
 					target.after, target.before, true);
@@ -1459,7 +1459,7 @@ extends SimpleComponentEditor<T, P> implements AbstractTableBuilder<R, T, P>, Co
 
 		@Override
 		public boolean importData(TransferSupport support) {
-			try (Transaction rowT = lockRows(true); Transaction colT = getColumns().lock(false, null)) {
+			try (Transaction rowT = lockRows(true); Transaction colT = getColumns().lock(false)) {
 				TransferTarget target = getTarget(support);
 				return doImport(support, target.rowIndex, target.colIndex, target.beforeRow, target.beforeCol, target.targetRow,
 					target.after, target.before, false);

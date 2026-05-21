@@ -536,7 +536,7 @@ public class VirtualMultiPane<T> extends JComponent implements Scrollable {
 	protected void paintChildren(Graphics g) {
 		Rectangle clip = g.getClipBounds();
 		VMPanelRenderMC<T> cell = new VMPanelRenderMC<>();
-		try (Transaction t = theValues.lock(false, null)) {
+		try (Transaction t = theValues.lock(false)) {
 			// Painting is done in reverse order, to give lower-index widgets higher visibility
 			int row = theValues.size();
 			for (CollectionElement<T> value : theValues.elements().reverse()) {

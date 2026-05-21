@@ -296,13 +296,13 @@ class DefaultTesting implements InteractiveTesting {
 			}
 
 			@Override
-			public Transaction lock(boolean write, Object cause) {
-				return theWrappedValue.lock(write, cause);
+			public Getter<T> lock(boolean tryOnly) {
+				return theWrappedValue.lock(tryOnly);
 			}
 
 			@Override
-			public Transaction tryLock(boolean write, Object cause) {
-				return theWrappedValue.tryLock(write, cause);
+			public Setter<T> lockWrite(boolean tryOnly, Object cause) {
+				return theWrappedValue.lockWrite(tryOnly, cause);
 			}
 
 			@Override
@@ -313,11 +313,6 @@ class DefaultTesting implements InteractiveTesting {
 			@Override
 			public long getStamp() {
 				return theWrappedValue.getStamp();
-			}
-
-			@Override
-			public boolean isLockSupported() {
-				return theWrappedValue.isLockSupported();
 			}
 
 			@Override

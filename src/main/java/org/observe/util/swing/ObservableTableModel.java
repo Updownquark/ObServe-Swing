@@ -141,7 +141,7 @@ public class ObservableTableModel<R> extends AbstractObservableTableModel<R> imp
 			return;
 		CategoryRenderStrategy<? super R, Object> column = (CategoryRenderStrategy<? super R, Object>) getColumnModel()
 			.getElementAt(columnIndex);
-		try (Transaction t = theRows.lock(true, null)) {
+		try (Transaction t = theRows.lockWrite(false, null)) {
 			if (rowIndex >= theRows.size())
 				return;
 			MutableCollectionElement<R> rowElement = theRows.mutableElement(theRows.getElement(rowIndex).getElementId());
@@ -171,7 +171,7 @@ public class ObservableTableModel<R> extends AbstractObservableTableModel<R> imp
 
 	@Override
 	protected Transaction lockRows(boolean write, Object cause) {
-		return theRows.lock(write, cause);
+		return write ? theRows.lockWrite(false, cause) : theRows.lock(false);
 	}
 
 	@Override

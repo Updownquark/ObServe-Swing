@@ -664,7 +664,7 @@ public class ObservableSwingUtils {
 				callbackLock[0] = true;
 				try {
 					if (e.getIndex0() <= selModel.getMinSelectionIndex() && e.getIndex1() >= selModel.getMinSelectionIndex()) {
-						Transaction t = selection.tryLock(true, e);
+						Transaction t = selection.lockWrite(true, e);
 						if (t != null) {
 							try {
 								E newSelection = model.getElementAt(selModel.getMinSelectionIndex());
@@ -722,7 +722,7 @@ public class ObservableSwingUtils {
 						Causable cause = Causable.simpleCause(Causable.broken(evt));
 						Transaction t2 = null;
 						try (Transaction t = cause.use()) {
-							t2 = model instanceof ObservableListModel ? ((ObservableListModel<?>) model).getWrapped().tryLock(true, cause)
+							t2 = model instanceof ObservableListModel ? ((ObservableListModel<?>) model).getWrapped().lockWrite(true, cause)
 								: Transaction.NONE;
 							if (t2 != null)
 								update.update(selModel.getMaxSelectionIndex(), cause);

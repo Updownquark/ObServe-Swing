@@ -104,7 +104,6 @@ import org.qommons.QommonsUtils;
 import org.qommons.StringUtils;
 import org.qommons.Subscription;
 import org.qommons.ThreadConstraint;
-import org.qommons.Transaction;
 import org.qommons.ValueHolder;
 import org.qommons.collect.BetterList;
 import org.qommons.collect.ListElement;
@@ -2381,23 +2380,54 @@ class PanelPopulationImpl {
 		}
 
 		@Override
-		public Transaction lock(boolean write, Object cause) {
-			return theWrapped.lock(write, cause);
+		public Getter<T> lock(boolean tryOnly) {
+			return theWrapped.lock(tryOnly);
 		}
 
 		@Override
-		public Transaction tryLock(boolean write, Object cause) {
-			return theWrapped.tryLock(write, cause);
+		public Setter<T> lockWrite(boolean tryOnly, Object cause) {
+			Setter<T> wrapped = theWrapped.lockWrite(tryOnly, cause);
+			if (wrapped == null || theFilter == null)
+				return wrapped;
+			return new Setter<T>() {
+				@Override
+				public T get() {
+					return wrapped.get();
+				}
+
+				@Override
+				public String isEnabled() {
+					return wrapped.isEnabled();
+				}
+
+				@Override
+				public String isAcceptable(T value) {
+					String msg = theFilter.apply(value);
+					if (msg == null)
+						msg = wrapped.isAcceptable(value);
+					return msg;
+				}
+
+				@Override
+				public T set(T value) {
+					String msg = theFilter.apply(value);
+					if (StdMsg.UNSUPPORTED_OPERATION.equals(msg))
+						throw new UnsupportedOperationException(msg);
+					else if (msg != null)
+						throw new IllegalArgumentException(msg);
+					return wrapped.set(value);
+				}
+
+				@Override
+				public void close() {
+					wrapped.close();
+				}
+			};
 		}
 
 		@Override
 		public Collection<Cause> getCurrentCauses() {
 			return theWrapped.getCurrentCauses();
-		}
-
-		@Override
-		public boolean isLockSupported() {
-			return theWrapped.isLockSupported();
 		}
 
 		@Override

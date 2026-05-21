@@ -607,7 +607,7 @@ public class ObservableTextEditor<E> {
 
 	private boolean doCommit(E parsed, Object cause, boolean maybeReformat) {
 		isInternallyChanging = true;
-		try (Transaction t = theValue.lock(true, cause)) {
+		try (Transaction t = theValue.lockWrite(false, cause)) {
 			theValue.set(parsed, cause);
 			isDirty = false;
 			if (maybeReformat && reformatOnCommit) {

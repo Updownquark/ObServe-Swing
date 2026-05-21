@@ -223,7 +223,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 		});
 		subs.add(theSourceRows.subscribe(evt -> {
 			evt.getRootCausable().onFinish(transKey)//
-			.computeIfAbsent("trans", __ -> theSelectableValues.lock(true, evt.getRootCausable()));
+				.computeIfAbsent("trans", __ -> theSelectableValues.lockWrite(false, evt.getRootCausable()));
 			CollectionElement<SelectableValue<T, X>> selectableEl;
 			switch (evt.getType()) {
 			case add:
@@ -236,7 +236,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 					newSV = new SelectableValue<>(theSourceRows.getElement(evt.getElementId()), isIncludedByDefault);
 				newSV.theDestValue = theMap.apply(evt.getNewValue());
 				if (move != null) {
-					try (Transaction t2 = theSelectableValues.lock(true, move.selectableMove)) {
+					try (Transaction t2 = theSelectableValues.lockWrite(false, move.selectableMove)) {
 						selectableEl = theSelectableValues.addElement(newSV, false);
 					}
 				} else
@@ -250,7 +250,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 					CollectionElementMove selectableMove = new CollectionElementMove();
 					moves.put(evt.getMovement(), new SourceMove(selectableMove, selectableEl.get()));
 					evt.getMovement().onDiscard(rowMove -> moves.remove(rowMove).selectableMove.moveFinished());
-					try (Transaction t2 = theSelectableValues.lock(true, selectableMove)) {
+					try (Transaction t2 = theSelectableValues.lockWrite(false, selectableMove)) {
 						selectableEl.get().remove();
 					}
 				} else
@@ -319,7 +319,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 			.addHPanel(null, new JustifiedBoxLayout(true).mainJustified().crossJustified(), bp -> bp.withName("OVS Buttons 2")//
 				.addButton(null, evt -> { // Include all button
 					selectCallbackLock[0] = true;
-					try (Transaction t2 = theIncludedValues.lock(true, evt); Transaction t3 = theDisplayedValues.lock(false, evt)) {
+					try (Transaction t2 = theIncludedValues.lockWrite(false, evt); Transaction t3 = theDisplayedValues.lock(false)) {
 						for (SelectableValue<T, X> sv : theDisplayedValues) {
 							if (!sv.included)
 								sv.setIncluded(true);
@@ -345,7 +345,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 				})//
 				.addButton(null, evt -> { // Include selected button
 					selectCallbackLock[0] = true;
-					try (Transaction t2 = theIncludedValues.lock(true, evt); Transaction t3 = theDisplayedValues.lock(false, evt)) {
+					try (Transaction t2 = theIncludedValues.lockWrite(false, evt); Transaction t3 = theDisplayedValues.lock(false)) {
 						for (SelectableValue<T, X> sv : theDisplayedValues) {
 							if (sv.selected && !sv.included)
 								sv.setIncluded(true);
@@ -371,7 +371,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 				})//
 				.addButton(null, evt -> { // Exclude selected button
 					selectCallbackLock[0] = true;
-					try (Transaction t2 = theIncludedValues.lock(true, evt); Transaction t3 = theDisplayedValues.lock(false, evt)) {
+					try (Transaction t2 = theIncludedValues.lockWrite(false, evt); Transaction t3 = theDisplayedValues.lock(false)) {
 						for (SelectableValue<T, X> sv : theIncludedValues) {
 							if (sv.selected)
 								sv.setIncluded(false);
@@ -390,7 +390,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 				})//
 				.addButton(null, evt -> { // Exclude all button
 					selectCallbackLock[0] = true;
-					try (Transaction t2 = theIncludedValues.lock(true, evt); Transaction t3 = theDisplayedValues.lock(false, evt)) {
+					try (Transaction t2 = theIncludedValues.lockWrite(false, evt); Transaction t3 = theDisplayedValues.lock(false)) {
 						for (SelectableValue<T, X> sv : theIncludedValues)
 							sv.setIncluded(false);
 					} finally {

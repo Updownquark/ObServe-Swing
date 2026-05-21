@@ -31,9 +31,9 @@ import org.observe.collect.ObservableCollection;
 import org.qommons.ArrayUtils;
 import org.qommons.BreakpointHere;
 import org.qommons.IdentityKey;
+import org.qommons.Lockable;
 import org.qommons.Subscription;
 import org.qommons.ThreadConstraint;
-import org.qommons.Transactable;
 import org.qommons.Transaction;
 import org.qommons.collect.BetterList;
 import org.qommons.collect.CollectionElement;
@@ -546,7 +546,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 		void init(boolean withEvent) {
 			if (theChildren == null)
 				return;
-			try (Transaction t = Transactable.lock(theChildren, false, null)) {
+			try (Transaction t = Lockable.lockLockable(theChildren, false)) {
 				for (T value : theChildren)
 					theChildNodes.add(newChild(value));
 
@@ -681,8 +681,8 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 			if (theUnsafeChildren == children
 				|| (children != null && theUnsafeChildren != null && children.getIdentity().equals(theUnsafeChildren.getIdentity())))
 				return;
-			try (Transaction t = Transactable.lock(theChildren, false, null); //
-				Transaction t2 = Transactable.lock(children, false, null)) {
+			try (Transaction t = Lockable.lockLockable(theChildren, false); //
+				Transaction t2 = Lockable.lockLockable(children, false)) {
 				unsubscribe.onNext(null);
 				if (theChildren != null) {
 					if (DEBUG > 0)
@@ -978,7 +978,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 						MutableCollectionElement<T> el = (MutableCollectionElement<T>) children
 							.mutableElement(children.getElement(childIdx).getElementId());
 						if (el.isAcceptable(evt.getNewValue().getLast()) == null) {
-							try (Transaction t = children.lock(true, evt)) {
+							try (Transaction t = children.lockWrite(false, evt)) {
 								el.set(evt.getNewValue().getLast());
 							}
 						}
@@ -1047,7 +1047,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 				return;
 			ObservableSwingUtils.flushEQCache();
 			callbackLock[0] = true;
-			try (Transaction t = multiSelection.lock(true, e)) {
+			try (Transaction t = multiSelection.lockWrite(false, e)) {
 				CollectionUtils
 				.synchronize(multiSelection, Arrays.asList(selectionModel.getSelectionPaths()),
 					(better, treePath) -> isSamePath(better, treePath, equivalence))//
@@ -1096,7 +1096,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 				if (parentRow < 0 || !tree.isExpanded(parentRow))
 					return;
 
-				Transaction t = multiSelection.tryLock(true, e);
+				Transaction t = multiSelection.lockWrite(true, e);
 				if (t == null)
 					return;
 				callbackLock[0] = true;
@@ -1116,7 +1116,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 				if (callbackLock[0])
 					return;
 				// Update the entire selection
-				Transaction t = multiSelection.tryLock(true, e);
+				Transaction t = multiSelection.lockWrite(true, e);
 				if (t == null)
 					return;
 				try {
@@ -1134,7 +1134,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 			if (callbackLock[0])
 				return;
 			callbackLock[0] = true;
-			try (Transaction t = multiSelection.lock(false, modelListener)) {
+			try (Transaction t = multiSelection.lock(false)) {
 				TreePath[] selection = new TreePath[multiSelection.size()];
 				int i = 0;
 				for (BetterList<T> path : multiSelection)

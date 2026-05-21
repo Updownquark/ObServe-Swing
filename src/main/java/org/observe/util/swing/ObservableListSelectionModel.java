@@ -243,7 +243,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 					for (int i = end; i >= start; i = value.previousSetBit(i - 1)) {
 						// else This index was selected before it was removed
 						if (selectionLock == null)
-							selectionLock = wrapped.lock(true, cause.isTerminated() ? Causable.broken(cause) : cause);
+							selectionLock = wrapped.lockWrite(false, cause.isTerminated() ? Causable.broken(cause) : cause);
 						CollectionChangeEvent.ElementChange<?> change = cause.getChangeFor(i);
 						if (change.movement != null) {
 							CollectionElementMove selMove = new CollectionElementMove();
@@ -296,7 +296,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 							continue;
 						// else This index was selected before it was removed
 						if (selectionLock == null)
-							selectionLock = wrapped.lock(true, cause.isTerminated() ? Causable.broken(cause) : cause);
+							selectionLock = wrapped.lockWrite(false, cause.isTerminated() ? Causable.broken(cause) : cause);
 						int selectionIndex = value.countBitsSetBetween(0, i);
 						wrapped.set(selectionIndex, getListModel().getElementAt(i));
 					}
@@ -313,7 +313,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 
 	@Override
 	public String canAdd(E newValue, ElementId after, ElementId before) {
-		try (Transaction t = lock(false, null)) {
+		try (Transaction t = lock(false)) {
 			int index = getAddIndex(newValue, after, before, true);
 			if (index < 0)
 				return NO_SUCH_MODEL_VALUE;
@@ -325,7 +325,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 		int minAddIndex = after == null ? -1 : value.indexOfNthSetBit(getWrapped().getElement(after).getElementsBefore());
 		int maxAddIndex = before == null ? theListModel.getSize()
 			: value.indexOfNthSetBit(getWrapped().getElement(before).getElementsBefore());
-		try (Transaction t = theListModel.getWrapped().lock(false, null)) {
+		try (Transaction t = theListModel.getWrapped().lock(false)) {
 			ListElement<E> listEl = theListModel.getWrapped().subList(minAddIndex + 1, maxAddIndex).getElement(newValue, first);
 			if (listEl == null)
 				return -1;
@@ -338,8 +338,8 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 			for (int i = value.nextClearBit(minAddIndex + 1); i < maxAddIndex; i = value.nextClearBit(i + 1)) {
 				if (i > 0 && value.get(i - 1))
 					after = CollectionElement
-						.getElementId(
-							after == null ? getWrapped().getTerminalElement(true) : getWrapped().getElement(after).getAdjacent(true));
+					.getElementId(
+						after == null ? getWrapped().getTerminalElement(true) : getWrapped().getElement(after).getAdjacent(true));
 				E modelValue = theListModel.getElementAt(i);
 				if (getWrapped().equivalence().elementEquals(modelValue, newValue))
 					return i;
@@ -360,7 +360,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 	@Override
 	public ListElement<E> addElement(E newValue, ElementId after, ElementId before, boolean first)
 		throws UnsupportedOperationException, IllegalArgumentException {
-		try (Transaction t = lock(true, null)) {
+		try (Transaction t = lockWrite(false, null)) {
 			int index = getAddIndex(newValue, after, before, first);
 			if (index < 0)
 				throw new IllegalArgumentException(NO_SUCH_MODEL_VALUE);
@@ -764,7 +764,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 						}
 						if (t == null) {
 							cause = Causable.simpleCause();
-							t = Transaction.and(cause.use(), getWrapped().lock(true, cause));
+							t = Transaction.and(cause.use(), getWrapped().lockWrite(false, cause));
 						}
 						lastSelected = getWrapped().addElement(theListModel.getElementAt(i), CollectionElement.getElementId(lastSelected),
 							null, true);
@@ -785,7 +785,7 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 					ListElement<E> prevSelected = lastSelected.getAdjacent(false);
 					if (t == null) {
 						cause = Causable.simpleCause();
-						t = Transaction.and(cause.use(), getWrapped().lock(true, cause));
+						t = Transaction.and(cause.use(), getWrapped().lockWrite(false, cause));
 					}
 					getWrapped().mutableElement(lastSelected.getElementId()).remove();
 					lastSelected = prevSelected;
@@ -1028,8 +1028,8 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 					if (selMove != null) {
 						setState(i, true);
 						if (selectionLock == null)
-							selectionLock = getWrapped().lock(true, cause.isTerminated() ? Causable.broken(cause) : cause);
-						try (Transaction moveT = getWrapped().lock(true, selMove)) {
+							selectionLock = getWrapped().lockWrite(false, cause.isTerminated() ? Causable.broken(cause) : cause);
+						try (Transaction moveT = getWrapped().lockWrite(false, selMove)) {
 							if (lastSelectionAdded == null) {
 								int selectionAddIndex = value.countBitsSetBetween(0, i);
 								lastSelectionAdded = getWrapped().addElement(selectionAddIndex, getListModel().getElementAt(i));
@@ -1039,8 +1039,8 @@ public class ObservableListSelectionModel<E> extends ObservableCollectionWrapper
 						}
 					} else if (value.get(i)) {
 						if (selectionLock == null)
-							selectionLock = getWrapped().lock(true, cause.isTerminated() ? Causable.broken(cause) : cause);
-						try (Transaction moveT = getWrapped().lock(true, selMove)) {
+							selectionLock = getWrapped().lockWrite(false, cause.isTerminated() ? Causable.broken(cause) : cause);
+						try (Transaction moveT = getWrapped().lockWrite(false, selMove)) {
 							if (lastSelectionAdded == null) {
 								int selectionAddIndex = value.countBitsSetBetween(0, i);
 								lastSelectionAdded = getWrapped().addElement(selectionAddIndex, getListModel().getElementAt(i));

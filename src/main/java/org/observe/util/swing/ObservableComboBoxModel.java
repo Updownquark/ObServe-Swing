@@ -387,7 +387,7 @@ public class ObservableComboBoxModel<E> extends ObservableListModel<E> implement
 			}
 			String enabled = selected.isEnabled().get();
 			callbackLock[0] = true;
-			try (Transaction avT = availableValues.lock(false, null)) {
+			try (Transaction avT = availableValues.lock(false)) {
 				ListElement<? extends T> found = ((ObservableCollection<T>) availableValues).getElement(evt.getNewValue(), true);
 				if (found != null) {
 					currentSelectedElement[0] = found;

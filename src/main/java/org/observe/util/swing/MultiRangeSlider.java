@@ -1318,7 +1318,7 @@ public class MultiRangeSlider extends ConformingPanel {
 		theValidator = validator;
 		if (theValidator != null) {
 			// Re-validate all the ranges
-			try (Transaction t = theRanges.lock(true, null)) {
+			try (Transaction t = theRanges.lockWrite(false, null)) {
 				for (ListElement<Range> range : theRanges.elements()) {
 					Range newRange = theValidator.validate(this, range, range.get(), RangePoint.mid);
 					if (newRange!=null && !newRange.equals(range.get()))

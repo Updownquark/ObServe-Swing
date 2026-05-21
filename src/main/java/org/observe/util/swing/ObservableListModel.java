@@ -111,7 +111,7 @@ public class ObservableListModel<E> implements ListModel<E> {
 	}
 
 	private void beginListening() {
-		try (Transaction t = theWrapped.lock(false, null)) {
+		try (Transaction t = theWrapped.lock(false)) {
 			theCachedData.addAll(theWrapped);
 			theListening = theWrapped.changes().act(this::handleEvent);
 		}

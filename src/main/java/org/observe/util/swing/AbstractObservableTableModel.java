@@ -296,7 +296,7 @@ public abstract class AbstractObservableTableModel<R> {
 		TableHookup hookup = TableHookup.of(//
 			Subscription.forAll(subs.toArray(new Subscription[subs.size()])), //
 			ml::getHoveredRow, ml::getHoveredColumn);
-		try (Transaction rowT = lockRows(false, null); Transaction colT = getColumns().lock(false, null)) {
+		try (Transaction rowT = lockRows(false, null); Transaction colT = getColumns().lock(false)) {
 			hookupCurrentColumns(table, ctx, hookup);
 			ListDataListener columnListener = new ListDataListener() {
 				@Override

@@ -397,7 +397,7 @@ public class ObservableTreeTableModel<T> extends AbstractObservableTableModel<Be
 						MutableCollectionElement<T> el = (MutableCollectionElement<T>) children
 							.mutableElement(children.getElement(childIdx).getElementId());
 						if (el.isAcceptable(evt.getNewValue().getLast()) == null) {
-							try (Transaction t = children.lock(true, evt)) {
+							try (Transaction t = children.lockWrite(false, evt)) {
 								el.set(evt.getNewValue().getLast());
 							}
 						}
@@ -467,7 +467,7 @@ public class ObservableTreeTableModel<T> extends AbstractObservableTableModel<Be
 				return;
 			ObservableSwingUtils.flushEQCache();
 			callbackLock[0] = true;
-			try (Transaction t = multiSelection.lock(true, e)) {
+			try (Transaction t = multiSelection.lockWrite(false, e)) {
 				CollectionUtils
 				.synchronize(multiSelection, Arrays.asList(selectionModel.getSelectionPaths()),
 					(better, treePath) -> ObservableTreeModel.isSamePath(better, treePath, equivalence))//
@@ -514,7 +514,7 @@ public class ObservableTreeTableModel<T> extends AbstractObservableTableModel<Be
 				if (parentRow < 0 || !treeTable.isExpanded(parentRow))
 					return;
 
-				Transaction t = multiSelection.tryLock(true, e);
+				Transaction t = multiSelection.lockWrite(true, e);
 				if (t == null)
 					return;
 				callbackLock[0] = true;
@@ -537,7 +537,7 @@ public class ObservableTreeTableModel<T> extends AbstractObservableTableModel<Be
 				if (callbackLock[0])
 					return;
 				// Update the entire selection
-				Transaction t = multiSelection.tryLock(true, e);
+				Transaction t = multiSelection.lockWrite(true, e);
 				if (t == null)
 					return;
 				try {
@@ -555,7 +555,7 @@ public class ObservableTreeTableModel<T> extends AbstractObservableTableModel<Be
 			if (callbackLock[0])
 				return;
 			callbackLock[0] = true;
-			try (Transaction t = multiSelection.lock(false, modelListener)) {
+			try (Transaction t = multiSelection.lock(false)) {
 				TreePath[] selection = new TreePath[multiSelection.size()];
 				int i = 0;
 				for (BetterList<T> path : multiSelection)
