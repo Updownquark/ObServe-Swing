@@ -97,8 +97,8 @@ public class ObservableFileButton extends JButton {
 		theFileWatchHandle = QommonsTimer.getCommonInstance().build(() -> {
 			File selected = theValue.get();
 			if (selected != null && checkFile(selected))
-				repaint();
-		}, Duration.ofSeconds(1), false).onEDT();
+				EventQueue.invokeLater(this::repaint);
+		}, Duration.ofSeconds(1), false);
 		setIcon(ObservableSwingUtils.getFixedIcon(ObservableFileButton.class, "/icons/disk.png", 16, 16));
 		setMargin(new Insets(2, 2, 2, 2));
 		theFileChooser = new JFileChooser();

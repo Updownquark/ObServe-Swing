@@ -252,7 +252,8 @@ public class ObservableListModel<E> implements ListModel<E> {
 				throw new IllegalStateException("A cause may only be finished once");
 			isFinished = true;
 			try {
-				Causable.terminate(theKeys.values(), this);
+				if (theKeys != null)
+					Causable.terminate(theKeys.values(), this);
 			} finally {
 				isTerminated = true;
 			}

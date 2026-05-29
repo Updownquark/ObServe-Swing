@@ -1015,7 +1015,7 @@ public class MultiRangeSlider extends ConformingPanel {
 		}
 	}
 
-	private final boolean isVertical;
+	private boolean isVertical;
 	private final ObservableValue<Range> theSliderRange;
 	private final ObservableCollection<Range> theRanges;
 	private boolean isAdjustingBoundsForValue;
@@ -1251,6 +1251,15 @@ public class MultiRangeSlider extends ConformingPanel {
 				MultiRangeSlider.this.moveFocus(range, diff, evt);
 			}
 		});
+	}
+
+	/**
+	 * @param vertical Whether this slider should be oriented vertically or horizontally
+	 * @return This slider
+	 */
+	public MultiRangeSlider setVertical(boolean vertical) {
+		isVertical = vertical;
+		return this;
 	}
 
 	/** @return The bounds of this slider */

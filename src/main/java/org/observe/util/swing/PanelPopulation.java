@@ -1739,6 +1739,8 @@ public class PanelPopulation {
 			return withBounds(ObservableValue.of(min), ObservableValue.of(max));
 		}
 
+		P vertical(boolean vertical);
+
 		P withBounds(ObservableValue<Double> min, ObservableValue<Double> max);
 
 		P adjustBoundsForValue(boolean adjustForValue);

@@ -209,7 +209,7 @@ public class FontAdjuster implements Cloneable {
 	}
 
 	public FontAdjuster underline(boolean underline) {
-		return deriveFont(TextAttribute.UNDERLINE, underline);
+		return deriveFont(TextAttribute.UNDERLINE, underline ? TextAttribute.UNDERLINE_ON : 0);
 	}
 
 	public FontAdjuster strikethrough() {
@@ -217,7 +217,7 @@ public class FontAdjuster implements Cloneable {
 	}
 
 	public FontAdjuster strikethrough(boolean strikethrough) {
-		return deriveFont(TextAttribute.STRIKETHROUGH, strikethrough);
+		return deriveFont(TextAttribute.STRIKETHROUGH, strikethrough ? TextAttribute.STRIKETHROUGH_ON : 0);
 	}
 
 	public FontAdjuster italic() {

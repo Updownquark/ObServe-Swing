@@ -783,6 +783,12 @@ class PanelPopulationImpl {
 		}
 
 		@Override
+		public P vertical(boolean vertical) {
+			getEditor().setVertical(vertical);
+			return (P) this;
+		}
+
+		@Override
 		public P withBounds(ObservableValue<Double> min, ObservableValue<Double> max) {
 			// Can't ever have min>max
 			if (min.get() <= theMinValue.get().get()) {
