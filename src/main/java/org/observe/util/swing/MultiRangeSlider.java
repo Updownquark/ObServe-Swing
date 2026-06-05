@@ -211,6 +211,8 @@ public class MultiRangeSlider extends ConformingPanel {
 
 			@Override
 			public Range validate(MultiRangeSlider slider, ListElement<Range> element, Range newValue, RangePoint moved) {
+				if (newValue == null)
+					return newValue;
 				boolean moveUp = newValue.getValue() > element.get().getValue();
 				Range adj = CollectionElement.get(element.getAdjacent(moveUp));
 
@@ -1146,7 +1148,7 @@ public class MultiRangeSlider extends ConformingPanel {
 					if (index == theRangeRenderBounds.size())
 						continue;
 					int relPos = pos - theRangeRenderBounds.get(index)[0];
-					if (relPos >= 0 && relPos < theRangeRenderBounds.get(index)[1]) {
+					if (range.get() != null && relPos >= 0 && relPos < theRangeRenderBounds.get(index)[1]) {
 						double hit = Math.abs(value - range.get().getValue()) / tol;
 						for (int prec = 0; prec < foundPerPixel.length; prec++) {
 							if (foundPerPixel[prec] == null && hit <= prec + 1) {

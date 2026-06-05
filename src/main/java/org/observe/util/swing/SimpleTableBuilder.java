@@ -296,7 +296,7 @@ implements TableBuilder<R, T, P> {
 						return cell.getCellValue();
 					else if (!up && cell.getRowIndex() == theFilteredRows.size() - 1)
 						return cell.getCellValue();
-						try (Transaction t = theFilteredRows.lockWrite(false, null)) {
+					try (Transaction t = theFilteredRows.lockWrite(false, null)) {
 						CollectionElement<R> row = theRows.getElement(cell.getRowIndex());
 						CollectionElement<R> adj = row.getAdjacent(!up);
 						if (adj != null) {
@@ -634,16 +634,18 @@ implements TableBuilder<R, T, P> {
 		Component comp = super.createComponent();
 
 		if (theCountTitleDisplayedText != null && comp instanceof JComponent) {
+			ObservableValue<String> borderText;
 			NumberFormat numberFormat = NumberFormat.getIntegerInstance();
 			String singularItemName = getItemName() != null ? getItemName() : "item";
 			String pluralItemName = StringUtils.pluralize(singularItemName);
 			TitledBorder border = BorderFactory.createTitledBorder(singularItemName);
 			if (theFilteredValueRows != null) {
-				theRows.observeSize()
-				.<String> transform(tx -> tx//
+				borderText = theRows.observeSize().<String> transform(tx -> tx//
 					.combineWith(theFilteredValueRows.observeSize())//
 					.combineWith(theCountTitleDisplayedText)//
 					.combine((sz, f, ttl) -> {
+						if (ttl == null)
+							return null;
 						String text;
 						if (theFilter.get() != TableContentControl.DEFAULT) {// Filtering active
 							if (f != sz)
@@ -655,30 +657,34 @@ implements TableBuilder<R, T, P> {
 						} else
 							text = "";
 						text += numberFormat.format(sz) + " " + (sz == 1 ? singularItemName : pluralItemName);
-						if (ttl != null && !ttl.isEmpty())
+						if (!ttl.isEmpty())
 							text += " " + ttl;
 						return text;
-					}))//
-				.changes().takeUntil(getUntil()).act(evt -> {
-					border.setTitle(evt.getNewValue());
-					comp.repaint();
-				});
+					}));
 			} else {
-				theRows.observeSize()//
-				.<String> transform(tx -> tx//
-					.combineWith(theCountTitleDisplayedText)//
-					.combine((sz, ttl) -> {
-						String text = numberFormat.format(sz) + " " + (sz == 1 ? singularItemName : pluralItemName);
-						if (ttl != null && !ttl.isEmpty())
-							text += " " + ttl;
-						return text;
-					}))
-				.changes().takeUntil(getUntil()).act(evt -> {
-					border.setTitle(evt.getNewValue());
-					comp.repaint();
-				});
+				borderText = theRows.observeSize()//
+					.<String> transform(tx -> tx//
+						.combineWith(theCountTitleDisplayedText)//
+						.combine((sz, ttl) -> {
+							if (ttl == null)
+								return null;
+							String text = numberFormat.format(sz) + " " + (sz == 1 ? singularItemName : pluralItemName);
+							if (!ttl.isEmpty())
+								text += " " + ttl;
+							return text;
+						}));
 			}
-			((JComponent) comp).setBorder(border);
+			borderText.changes().takeUntil(getUntil()).act(evt -> {
+				if (evt.getNewValue() == null)
+					((JComponent) comp).setBorder(null);
+				else {
+					border.setTitle(evt.getNewValue());
+					if (((JComponent) comp).getBorder() != border)
+						((JComponent) comp).setBorder(border);
+					else
+						comp.repaint();
+				}
+			});
 		}
 
 		return comp;
