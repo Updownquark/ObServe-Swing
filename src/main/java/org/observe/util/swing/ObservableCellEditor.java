@@ -661,6 +661,8 @@ public interface ObservableCellEditor<M, C> extends TableCellEditor, TreeCellEdi
 				theEditorSubscription.uninstall(false);
 				theEditorSubscription = null;
 			}
+			row = table.convertRowIndexToModel(row);
+			column = table.convertColumnIndexToModel(column);
 			boolean rowHovered = theHoveredRow != null && theHoveredRow.getAsInt() == row;
 			boolean cellHovered = rowHovered && theHoveredColumn != null && theHoveredColumn.getAsInt() == column;
 			renderingValue(value, isSelected, rowHovered, cellHovered, false, true, row, column);
@@ -691,8 +693,10 @@ public interface ObservableCellEditor<M, C> extends TableCellEditor, TreeCellEdi
 				} else
 					tooltip = null;
 				if (theValueTooltip != null) {
+					int fRow = row;
+					int fColumn = column;
 					valueTooltip = c -> theValueTooltip
-						.apply(new ModelCell.Default<>(() -> modelValue, c, row, column, isSelected, isSelected, rowHovered, cellHovered,
+						.apply(new ModelCell.Default<>(() -> modelValue, c, fRow, fColumn, isSelected, isSelected, rowHovered, cellHovered,
 							true, true));
 				} else
 					valueTooltip = null;
@@ -800,7 +804,9 @@ public interface ObservableCellEditor<M, C> extends TableCellEditor, TreeCellEdi
 				} else
 					tooltip = null;
 				if (theValueTooltip != null) {
-					valueTooltip = c -> theValueTooltip.apply(new ModelCell.Default<>(() -> modelValue, c, row, column, isSelected,
+					int fRow = row;
+					int fColumn = column;
+					valueTooltip = c -> theValueTooltip.apply(new ModelCell.Default<>(() -> modelValue, c, fRow, fColumn, isSelected,
 						isSelected, rowHovered, cellHovered, true, true));
 				} else
 					valueTooltip = null;

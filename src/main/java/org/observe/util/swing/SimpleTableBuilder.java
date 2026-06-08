@@ -474,7 +474,8 @@ implements TableBuilder<R, T, P> {
 				() -> theDisplayedColumns, theFilter.refresh(columnChanges), getUntil());
 			theFilteredValueRows = rawFiltered.safe(ThreadConstraint.EDT, getUntil());
 			theFilteredRows = theFilteredValueRows.flow()
-				.<R> transform(tx -> tx.map(FunctionUtils.printableFn(f -> f.value, "value", null)).modifySource(FilteredValue::setValue))
+				.<R> transform(tx -> tx.map(FunctionUtils.printableFn(f -> f.value, "value", null)).modifySource(FilteredValue::setValue,
+					rev -> rev.createWith(v -> new FilteredValue<>(v, 0))))
 				.collectActive(getUntil());
 		} else {
 			theFilteredValueRows = null;
