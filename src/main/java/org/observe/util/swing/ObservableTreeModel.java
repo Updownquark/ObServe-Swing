@@ -1153,7 +1153,7 @@ public abstract class ObservableTreeModel<T> implements TreeModel {
 	}
 
 	public static <T> boolean isSamePath(BetterList<T> valuePath, TreePath treePath, Equivalence<? super T> equivalence) {
-		for (T value : valuePath.reverse()) {
+		for (T value : valuePath.reversed()) {
 			if (treePath == null)
 				return false;
 			if (!equivalence.elementEquals(((ObservableTreeModel<T>.TreeNode) treePath.getLastPathComponent()).get(), value))

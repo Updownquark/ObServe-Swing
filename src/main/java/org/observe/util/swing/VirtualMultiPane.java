@@ -539,7 +539,7 @@ public class VirtualMultiPane<T> extends JComponent implements Scrollable {
 		try (Transaction t = theValues.lock(false)) {
 			// Painting is done in reverse order, to give lower-index widgets higher visibility
 			int row = theValues.size();
-			for (CollectionElement<T> value : theValues.elements().reverse()) {
+			for (CollectionElement<T> value : theValues.elements().reversed()) {
 				row--;
 				Rectangle bounds = theValueBounds.get(row);
 				if (bounds == null || !clip.intersects(bounds))

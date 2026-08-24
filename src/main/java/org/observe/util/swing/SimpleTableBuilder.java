@@ -411,7 +411,8 @@ implements TableBuilder<R, T, P> {
 			for (DynamicColumnSet<R, ?> dc : theDynamicColumns) {
 				columnSets.add(evaluateDynamicColumns(dc));
 			}
-			columns = ObservableCollection.flattenCollections(columnSets.toArray(new ObservableCollection[columnSets.size()]))
+			columns = ObservableCollection
+				.<CategoryRenderStrategy<R, ?>> flattenCollections(columnSets.toArray(new ObservableCollection[columnSets.size()]))
 				.collectActive(getUntil());
 		}
 		return columns;

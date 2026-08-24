@@ -456,7 +456,7 @@ public class AppPopulation {
 					TimeUtils.RelativeTimeFormat durationFormat = TimeUtils.relativeFormat()
 						.withMaxPrecision(TimeUtils.DurationComponentType.Second).withMaxElements(2).withMonthsAndYears();
 					content.addLabel(null, "Please choose a backup to restore", null)//
-					.addTable(ObservableCollection.of(backupTimes.reverse()), table -> {
+					.addTable(ObservableCollection.of(backupTimes.reversed()), table -> {
 						table.fill()
 						.withColumn("Date", Instant.class, t -> t,
 							col -> col.formatText(PAST_DATE_FORMAT::format).withWidths(80, 160, 500))//
