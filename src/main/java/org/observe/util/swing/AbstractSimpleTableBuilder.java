@@ -66,6 +66,7 @@ import org.observe.util.swing.PanelPopulationImpl.SimpleHPanel;
 import org.qommons.IntList;
 import org.qommons.StringUtils;
 import org.qommons.Subscription;
+import org.qommons.TableContentControl;
 import org.qommons.ThreadConstraint;
 import org.qommons.Transaction;
 import org.qommons.collect.BetterList;

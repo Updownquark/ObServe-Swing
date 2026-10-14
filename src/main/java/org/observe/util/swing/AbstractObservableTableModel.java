@@ -34,6 +34,7 @@ import org.observe.util.TypeTokens;
 import org.observe.util.swing.CategoryRenderStrategy.CategoryKeyListener;
 import org.observe.util.swing.CategoryRenderStrategy.CategoryMouseListener;
 import org.qommons.IntList;
+import org.qommons.SortedMatchSet;
 import org.qommons.Subscription;
 import org.qommons.Transaction;
 import org.qommons.collect.ListenerList;

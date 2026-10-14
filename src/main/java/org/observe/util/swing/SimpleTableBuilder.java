@@ -42,10 +42,12 @@ import org.observe.util.swing.Dragging.SimpleTransferSource;
 import org.observe.util.swing.PanelPopulation.ComponentEditor;
 import org.observe.util.swing.PanelPopulation.DataAction;
 import org.observe.util.swing.PanelPopulation.TableBuilder;
-import org.observe.util.swing.TableContentControl.FilteredValue;
 import org.qommons.IntList;
+import org.qommons.SortedMatchSet;
 import org.qommons.StringUtils;
 import org.qommons.Subscription;
+import org.qommons.TableContentControl;
+import org.qommons.TableContentControl.FilteredValue;
 import org.qommons.ThreadConstraint;
 import org.qommons.Transaction;
 import org.qommons.collect.CollectionElement;
@@ -468,14 +470,15 @@ implements TableBuilder<R, T, P> {
 				getUntil().take(1).act(__ -> colClickSub.unsubscribe(true));
 			}
 
-			columns = TableContentControl.applyColumnControl(columns, theFilter, getUntil());
+			columns = SwingTableControl.applyColumnControl(columns, theFilter, getUntil());
 			theDisplayedColumns = columns;
 			Observable<?> columnChanges = Observable.or(Observable.constant(null), columns.simpleChanges());
-			ObservableCollection<TableContentControl.FilteredValue<R>> rawFiltered = TableContentControl.applyRowControl(theRows,
+			ObservableCollection<TableContentControl.FilteredValue<R>> rawFiltered = SwingTableControl.applyRowControl(theRows,
 				() -> theDisplayedColumns, theFilter.refresh(columnChanges), getUntil());
 			theFilteredValueRows = rawFiltered.safe(ThreadConstraint.EDT, getUntil());
 			theFilteredRows = theFilteredValueRows.flow()
-				.<R> transform(tx -> tx.map(FunctionUtils.printableFn(f -> f.value, "value", null)).modifySource(FilteredValue::setValue,
+				.<R> transform(tx -> tx.map(FunctionUtils.printableFn(f -> f.getValue(), "value", null)).modifySource(
+					FilteredValue::setValue,
 					rev -> rev.createWith(v -> new FilteredValue<>(v, 0))))
 				.collectActive(getUntil());
 		} else {

@@ -24,6 +24,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 
+import org.qommons.SortedMatchSet;
+import org.qommons.TextMatch;
 import org.qommons.fn.FunctionUtils;
 
 public interface ObservableCellRenderer<M, C> {

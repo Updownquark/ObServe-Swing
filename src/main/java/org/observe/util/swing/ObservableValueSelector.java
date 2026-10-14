@@ -42,6 +42,7 @@ import org.qommons.Colors;
 import org.qommons.QommonsUtils;
 import org.qommons.StringUtils;
 import org.qommons.Subscription;
+import org.qommons.TableContentControl;
 import org.qommons.ThreadConstraint;
 import org.qommons.Transaction;
 import org.qommons.collect.BetterSortedList;
@@ -277,7 +278,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 			.populateHPanel((JPanel) null, new JustifiedBoxLayout(true).mainJustified().crossJustified().forceFill(true), until)//
 			.withName("OVS Source")//
 			.addTextField(null, theFilterText, filterFormat == null ? TableContentControl.FORMAT : filterFormat,
-				tf -> TableContentControl.configureSearchField(tf.fill(), commitOnType).modifyEditor(tfe -> {
+				tf -> SwingTableControl.configureSearchField(tf.fill(), commitOnType).modifyEditor(tfe -> {
 					theSearchField = tfe;
 				}))//
 			.addTable(theSelectableValues, srcTbl -> {
@@ -414,7 +415,7 @@ public class ObservableValueSelector<T, X> extends JPanel {
 			// Invisible placeholder here to make the available and included tables the same height
 			.addTextField(null, SettableValue.<TableContentControl> build().build(),
 				filterFormat == null ? TableContentControl.FORMAT : filterFormat,
-					f -> TableContentControl.configureSearchField(f.fill(), commitOnType).visibleWhen(ObservableValue.of(false)))//
+					f -> SwingTableControl.configureSearchField(f.fill(), commitOnType).visibleWhen(ObservableValue.of(false)))//
 			.addTable(theIncludedValues, destTbl -> {
 				theDestTable = destTbl.getEditor();
 				theDestTable.setName("OVS Dest Table");
