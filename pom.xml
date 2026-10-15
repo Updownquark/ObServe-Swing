@@ -1,18 +1,40 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.observe</groupId>
-  <artifactId>ObServe-Swing</artifactId>
-  <version>4.0.0</version>
-  <name>ObServe-Swing</name>
-  <description>Java Swing utilities based on ObServe observable structures</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.quark-sw</groupId>
+	<artifactId>ObServe-Swing</artifactId>
+	<version>4.0.0</version>
+	<name>ObServe-Swing</name>
+	<description>Java Swing utilities based on ObServe observable structures</description>
+	<url>https://github.com/Updownquark/ObServe-Swing</url>
+	<scm>
+		<connection>scm:git:git://://github.com</connection>
+		<developerConnection>scm:git:ssh://github.com:updownquark/ObServe-Swing.git</developerConnection>
+		<url>https://github.com/tree/main</url>
+	</scm>
+	<developers>
+		<developer>
+			<name>Andrew Butler</name>
+			<email>updownquark@gmail.com</email>
+			<organization>Quark Software</organization>
+			<organizationUrl>https://quark-sw.com</organizationUrl>
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+		    <name>MIT License</name>
+		    <url>https://opensource.org</url>
+		    <distribution>repo</distribution>
+		</license>
+	</licenses>
 	<dependencies>
 		<dependency>
-			<groupId>org.qommons</groupId>
+			<groupId>com.quark-sw</groupId>
 			<artifactId>Qommons</artifactId>
 			<version>3.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.observe</groupId>
+			<groupId>com.quark-sw</groupId>
 			<artifactId>ObServe</artifactId>
 			<version>3.0.0</version>
 		</dependency>
